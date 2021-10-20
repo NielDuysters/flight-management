@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Flights</title>
+</head>
+<body>
+<h1>Flight Management</h1>
+
+<form action="#" th:action="@{/home}" th:object="${inputDate}" method="post">
+    <label>
+        Date:
+        <input type="date" th:field="*{date}"/>
+    </label>
+    <button type="submit" name="action" value="table">Table</button>
+    <button type="submit" name="action" value="ganttchart">Gantt Chart</button>
+</form>
+<h2>All Flights on <span th:text="${#dates.format(selectedDate, format)}"></span></h2>
+
+<table>
+    <tr th:each="flight : ${retrievedFlights}">
+        <td th:text="${flight.getName()}"> UUID</td>
+        <td th:text="${#dates.format(flight.getDate(), format)}"> Date</td>
+        <td th:text="${flight.getDepartureAirport().getIATA_CODE()}"> Airport of departure</td>
+        <td><a th:href="@{/flight/{uuid}(uuid=${flight.getUUID().toString()})}">Details</a></td>
+    </tr>
+</table>
+</body>
+</html>

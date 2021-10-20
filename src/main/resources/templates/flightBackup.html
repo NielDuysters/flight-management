@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Details</title>
+</head>
+<body>
+<h1>Flight Management</h1>
+
+<h2>Flight <span th:text="${retrievedFlight.getName() + ' on ' + #dates.format(retrievedFlight.getDate(), format)}"></span></h2>
+<table>
+    <tr>
+        <td>Airport of departure</td>
+        <td th:text="${retrievedFlight.getDepartureAirport().toString()}"></td>
+    </tr>
+    <tr>
+        <td>Airport of arrival</td>
+        <td th:text="${retrievedFlight.getArrivalAirport().toString()}"></td>
+    </tr>
+    <tr>
+        <td>Scheduled time of departure  |  arrival</td>
+        <td th:text="${#dates.format(retrievedFlight.getSTD(), format) + '  |  ' + #dates.format(retrievedFlight.getSTA(), format)}"></td>
+    </tr>
+    <tr>
+        <td>Estimated time of departure  |  arrival</td>
+        <td th:text="${#dates.format(retrievedFlight.getETD(), format) + '  |  ' + #dates.format(retrievedFlight.getETA(), format)}"></td>
+    </tr>
+    <tr>
+        <td>Actual time of departure  |  arrival</td>
+        <td th:text="${#dates.format(retrievedFlight.getATD(), format) + '  |  ' + #dates.format(retrievedFlight.getATA(), format)}"></td>
+    </tr>
+
+</table>
+<h2>Delays of flight <span th:text="${retrievedFlight.getName() + ' on ' + #dates.format(retrievedFlight.getDate(), format)}"></span></h2>
+<table th:if="${retrievedFlight.getDelays().size() > 0}">
+    <tr>
+        <th>D / A</th>
+        <th>#minutes</th>
+        <th>IATA code</th>
+        <th>Description</th>
+    </tr>
+    <tr th:each="delay : ${retrievedFlight.getDelays()}">
+        <td th:text="${delay.isDepartureDelay()} ? 'Departure' : 'Arrival'"></td>
+        <td th:text="${delay.getMinutes()}"></td>
+        <td th:text="${delay.getDelayType().getIATA_code()}"></td>
+        <td th:text="${delay.getDelayDescription()}"></td>
+    </tr>
+</table>
+<span th:if="${retrievedFlight.getDelays().size() == 0}">No delays found</span>
+<form action="#" th:action="@{/flight/{uuid}/createDelay(uuid=${retrievedFlight.getUUID().toString()})}" th:object="${newDelay}" method="post">
+    <label for="departure">Departure?</label>
+    <input id="departure" type="checkbox" th:field="*{departureDelay}"/>
+    <label for="minutes">#minutes</label>
+    <input id="minutes" type="number" th:field="*{minutes}"/>
+    <label for="IATA_CODE">IATA CODE</label>
+    <select id="IATA_CODE" th:field="*{delayType}">
+        <option th:each="delaytype : ${delayTypes}" th:value="${delaytype.getId()}" th:text="${delaytype.getIATA_code()}"></option>
+    </select>
+    <label for="description">description</label>
+    <input id="description" type="text" th:field="*{delayDescription}"/>
+    <button type="submit" name="action">Add delay</button>
+</form>
+</body>
+</html>

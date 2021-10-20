@@ -1,0 +1,18 @@
+.table {
+    display: table;
+    border-spacing: 2px;
+}
+.thead {
+    display: table-header-group;
+}
+.tbody {
+    display: table-row-group;
+}
+
+.tr {
+    display: table-row;
+}
+
+.td {
+    display: table-cell;
+}

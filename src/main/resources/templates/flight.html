@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Details</title>
+    <link rel="stylesheet" th:href="@{/css/flight.css}">
+</head>
+<body>
+    <h1>Flight Management</h1>
+    <h2>Flight <span th:text="${retrievedFlight.getName() + ' on ' + #dates.format(retrievedFlight.getDate(), format)}"></span></h2>
+    <table>
+        <tr>
+            <td>Airport of departure</td>
+            <td th:text="${retrievedFlight.getDepartureAirport().toString()}"></td>
+        </tr>
+        <tr>
+            <td>Airport of arrival</td>
+            <td th:text="${retrievedFlight.getArrivalAirport().toString()}"></td>
+        </tr>
+        <tr>
+            <td>Scheduled time of departure  |  arrival</td>
+            <td th:text="${#dates.format(retrievedFlight.getSTD(), format) + '  |  ' + #dates.format(retrievedFlight.getSTA(), format)}"></td>
+        </tr>
+        <tr>
+            <td>Estimated time of departure  |  arrival</td>
+            <td th:text="${#dates.format(retrievedFlight.getETD(), format) + '  |  ' + #dates.format(retrievedFlight.getETA(), format)}"></td>
+        </tr>
+        <tr>
+            <td>Actual time of departure  |  arrival</td>
+            <td th:text="${#dates.format(retrievedFlight.getATD(), format) + '  |  ' + #dates.format(retrievedFlight.getATA(), format)}"></td>
+        </tr>
+
+    </table>
+    <h2>Delays of flight <span th:text="${retrievedFlight.getName() + ' on ' + #dates.format(retrievedFlight.getDate(), format)}"></span></h2>
+    <div class="table" th:if="${retrievedFlight.getDelays().size() > 0}">
+        <div class="thead">
+            <div class="tr">
+                <span class="td">D / A</span>
+                <span class="td">#min</span>
+                <span class="td">IATA</span>
+                <span class="td">Description</span>
+                <span class="td"></span>
+            </div>
+        </div>
+        <div class="tbody" th:each="delay : ${retrievedFlight.getDelays()}">
+            <form class="tr" action="#" th:action="@{/flight/{uuid}/updateDelay(uuid=${retrievedFlight.getUUID().toString()})}" th:object="${updatedDelay}" method="post">
+                <span class="td"><input type="text" size="5" th:field="*{departureDelay}" th:value="${delay.isDepartureDelay()} ? 'Departure' : 'Arrival'"/></span>
+                <span class="td"><input type="number" size="2" th:field="*{minutes}" th:value="${delay.getMinutes()}" th:attr="value=${delay.getMinutes()}"/></span>
+                <span class="td"> <select th:field="*{delayType}">
+                <option th:each="delaytype : ${delayTypes}" th:value="${delaytype.getId()}"
+                        th:text="${delaytype.getIATA_code()}" th:selected="${delaytype.getId()==delay.getDelayType().getId()}"></option>
+            </select></span>
+                <span class="td"><input type="text" th:field="*{delayDescription}" th:value="${delay.getDelayDescription()}"/></span>
+                <span class="td"><button type="submit" name="action">Update delay</button></span>
+            </form>
+        </div>
+    </div>
+    <span th:if="${retrievedFlight.getDelays().size() == 0}">No delays found</span>
+    <br>
+    <form action="#" th:action="@{/flight/{uuid}/createDelay(uuid=${retrievedFlight.getUUID().toString()})}" th:object="${newDelay}" method="post">
+        <label for="departure">Departure?</label>
+        <input id="departure" type="checkbox" th:field="*{departureDelay}"/>
+        <label for="minutes">#minutes</label>
+        <input id="minutes" type="number" th:field="*{minutes}"/>
+        <label for="IATA_CODE">IATA CODE</label>
+        <select id="IATA_CODE" th:field="*{delayType}">
+            <option th:each="delaytype : ${delayTypes}" th:value="${delaytype.getId()}" th:text="${delaytype.getIATA_code()}"></option>
+        </select>
+        <label for="description">description</label>
+        <input id="description" type="text" th:field="*{delayDescription}"/>
+        <button type="submit" name="action">Add delay</button>
+    </form>
+</body>
+</html>

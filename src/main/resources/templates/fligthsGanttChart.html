@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Flights</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['gantt']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var ganttChartData = new google.visualization.DataTable();
+            ganttChartData.addColumn('string', 'Flight UUID');
+            ganttChartData.addColumn('string', 'Flight Name');
+            ganttChartData.addColumn('string', 'Time type')
+            ganttChartData.addColumn('date', 'Start Date');
+            ganttChartData.addColumn('date', 'End Date');
+
+            var request = new XMLHttpRequest()
+            request.open('GET', 'http://localhost:8080/api/flights', true)
+            request.onload = function () {
+                // Begin accessing JSON data here
+                var data = JSON.parse(this.response)
+                if (request.status >= 200 && request.status < 400) {
+                    data.forEach((flight) => {
+                        ganttChartData.addRow(
+                            ['Research', 'Find sources',
+                                new Date(2015, 0, 1), new Date(2015, 0, 5), null,  100,  null]);
+                    })
+                } else {
+                    const errorMessage = document.createElement('marquee')
+                    errorMessage.textContent = `Gah, it's not working!`
+                    app.appendChild(errorMessage)
+                }
+            }
+
+
+
+            var options = {
+                height: 275
+            };
+
+            var chart = new google.visualization.Gantt(document.getElementById('gantt-chart'));
+
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+<body>
+<div id="gantt-chart"></div>
+</body>
+</html>
